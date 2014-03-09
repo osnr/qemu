@@ -219,9 +219,22 @@ void HELPER(movec)(CPUM68KState *env, uint32_t reg, uint32_t val)
         break;
     case 0x04: case 0x05: case 0x06: case 0x07: /* ACR[0-3] */
         /* TODO: Implement Access Control Registers.  */
+        env->acr[reg - 0x04] = val;
+        break;
+    case 0x08: /* MMUBAR */
+        env->mmubar = val;
         break;
     case 0x801: /* VBR */
         env->vbr = val;
+        break;
+    case 0xc04: /* RAMBAR0 */
+        env->rambar0 = val;
+        break;
+    case 0xc05: /* RAMBAR1 */
+        env->rambar1 = val;
+        break;        
+    case 0xc0f: /* MBAR */
+        env->mbar = val;
         break;
     /* TODO: Implement control registers.  */
     default:
