@@ -212,6 +212,7 @@ void cpu_m68k_flush_flags(CPUM68KState *env, int cc_op)
 
 void HELPER(movec)(CPUM68KState *env, uint32_t reg, uint32_t val)
 {
+    fprintf(stderr, "MOVEC 0x%x 0x%x\n", reg, val);
     switch (reg) {
     case 0x02: /* CACR */
         env->cacr = val;
