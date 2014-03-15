@@ -218,6 +218,9 @@ void HELPER(movec)(CPUM68KState *env, uint32_t reg, uint32_t val)
         env->cacr = val;
         m68k_switch_sp(env);
         break;
+    case 0x03:
+        env->asid = val;
+        break;
     case 0x04: case 0x05: case 0x06: case 0x07: /* ACR[0-3] */
         /* TODO: Implement Access Control Registers.  */
         env->acr[reg - 0x04] = val;

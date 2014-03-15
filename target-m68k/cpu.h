@@ -105,6 +105,7 @@ typedef struct CPUM68KState {
     uint32_t cacr;
     uint32_t mmubar;
     uint32_t acr[4];
+    uint32_t asid;
 
     int pending_vector;
     int pending_level;
