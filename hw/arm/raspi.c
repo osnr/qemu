@@ -79,6 +79,7 @@ static void raspi_init(MachineState *args)
 
     MemoryRegion *per_todo_bus = g_new(MemoryRegion, 1);
     MemoryRegion *per_ic_bus = g_new(MemoryRegion, 1);
+    MemoryRegion *per_gpio_bus = g_new(MemoryRegion, 1);
     MemoryRegion *per_uart_bus = g_new(MemoryRegion, 1);
     MemoryRegion *per_st_bus = g_new(MemoryRegion, 1);
     MemoryRegion *per_sbm_bus = g_new(MemoryRegion, 1);
@@ -158,6 +159,18 @@ static void raspi_init(MachineState *args)
     for (n = 0; n < 72; n++) {
         pic[n] = qdev_get_gpio_in(dev, n);
     }
+
+    /* GPIO */
+    dev = sysbus_create_varargs("bcm2835_gpio", GPIO_BASE,
+            pic[INTERRUPT_GPIO0], pic[INTERRUPT_GPIO1],
+            pic[INTERRUPT_GPIO2], pic[INTERRUPT_GPIO3],
+            NULL);
+    s = SYS_BUS_DEVICE(dev);
+    mr = sysbus_mmio_get_region(s, 0);
+    memory_region_init_alias(per_gpio_bus, NULL, NULL, mr,
+        0, memory_region_size(mr));
+    memory_region_add_subregion(sysmem, BUS_ADDR(GPIO_BASE),
+        per_gpio_bus);
 
     /* UART */
     dev = sysbus_create_simple("pl011", UART0_BASE, pic[INTERRUPT_VC_UART]);
