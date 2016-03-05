@@ -140,6 +140,7 @@ static void fb_update_display(void *opaque)
     int dest_width = 0;
 
     static uint32_t frame; /* 0 */
+    MemoryRegionSection offset_fbsection;
 
     if (++frame < FRAMESKIP) {
         return;
@@ -186,21 +187,25 @@ static void fb_update_display(void *opaque)
         framebuffer_update_memory_section(&bcm2835_fb.fbsection,
                                           sysbus_address_space(&s->busdev),
                                           bcm2835_fb.base,
-                                          bcm2835_fb.yres, 
+                                          bcm2835_fb.yres_virtual,
                                           src_width);                
     }
 
+    offset_fbsection = bcm2835_fb.fbsection;
+    offset_fbsection.offset_within_region += bcm2835_fb.yoffset * src_width;
+    /* FIXME Bound offset_fbsection.size. */
+
     framebuffer_update_display(surface,
-        &bcm2835_fb.fbsection,
-        bcm2835_fb.xres,
-        bcm2835_fb.yres,
-        src_width,
-        dest_width,
-        0,
-        bcm2835_fb.invalidate,
-        fn,
-        NULL,
-        &first, &last);
+                               &offset_fbsection,
+                               bcm2835_fb.xres,
+                               bcm2835_fb.yres,
+                               src_width,
+                               dest_width,
+                               0,
+                               bcm2835_fb.invalidate,
+                               fn,
+                               NULL,
+                               &first, &last);
     if (first >= 0) {
         dpy_gfx_update(bcm2835_fb.con, 0, first,
             bcm2835_fb.xres, last - first + 1);
