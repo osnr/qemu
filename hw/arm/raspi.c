@@ -20,7 +20,9 @@
 #include "hw/loader.h"
 #include "hw/sysbus.h"
 #include "hw/arm/arm.h"
+#include "hw/char/serial.h"
 #include "sysemu/sysemu.h"
+#include "sysemu/char.h"
 #include "exec/address-spaces.h"
 #include "hw/arm/bcm2835_common.h"
 
@@ -99,6 +101,7 @@ static void raspi_init(MachineState *args)
     qemu_irq pic[72];
     qemu_irq mbox_irq[MBOX_CHAN_COUNT];
 
+    CharDriverState *chr;
     DeviceState *dev;
     SysBusDevice *s;
 
@@ -181,6 +184,13 @@ static void raspi_init(MachineState *args)
     memory_region_add_subregion(sysmem, BUS_ADDR(UART0_BASE),
         per_uart_bus);
 
+    /* Mini-UART */
+    chr = qemu_chr_new("uart1", "stdio", NULL);
+    serial_mm_init(sysmem, UART1_BASE + 0x40, 2,
+                   pic[INTERRUPT_AUX],
+                   115200, chr, DEVICE_NATIVE_ENDIAN);
+    memory_region_add_subregion(sysmem, BUS_ADDR(UART1_BASE + 0x20),
+                                g_new(MemoryRegion, 3));
 
     /* System timer */
     dev = sysbus_create_varargs("bcm2835_st", ST_BASE,
