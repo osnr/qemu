@@ -193,7 +193,7 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
      */
     chr = qemu_char_get_next_serial();
     if (chr == NULL) {
-        chr = qemu_chr_new("bcm2835.uart1", "null", NULL);
+        chr = qemu_chr_new("bcm2835.uart1", "stdio", NULL);
     }
     qdev_prop_set_chr(DEVICE(&s->aux), "chardev", chr);
 
