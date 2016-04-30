@@ -164,10 +164,13 @@ static void fb_update_display(void *opaque)
 
     if (s->invalidate) {
         framebuffer_update_memory_section(&s->fbsection, s->dma_mr, s->base,
-                                          s->yres, src_width);
+                                          s->yres_virtual, src_width);
     }
 
-    framebuffer_update_display(surface, &s->fbsection, s->xres, s->yres,
+    MemoryRegionSection offset_fbsection = s->fbsection;
+    offset_fbsection.offset_within_region += s->yoffset * src_width;
+    /* FIXME Bound offset_fbsection.size. */
+    framebuffer_update_display(surface, &offset_fbsection, s->xres, s->yres,
                                src_width, dest_width, 0, s->invalidate,
                                draw_line_src16, s, &first, &last);
 

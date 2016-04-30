@@ -71,6 +71,9 @@ static void bcm2835_realize(DeviceState *dev, Error **errp)
     sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 0,
                             BCM2835_PERI_BASE, 1);
 
+    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 1,
+                            0x40000000, 1);
+
     object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
     if (err) {
         error_report_err(err);
